@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>New Patient Prescription Entry</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
+    body { font-family: 'Roboto', Arial, sans-serif; background: linear-gradient(135deg, #e3f2fd 0%, #f3e5f5 100%); margin: 0; padding: 20px; min-height: 100vh; display: flex; align-items: center; justify-content: center; }
+    .container { max-width: 900px; width: 100%; background: #fff; border-radius: 16px; box-shadow: 0 8px 32px rgba(0,0,0,0.15); padding: 40px; transition: all 0.3s ease; }
+    .header { background: linear-gradient(135deg, #1976d2 0%, #1565c0 100%); color: #fff; padding: 28px 40px; border-radius: 16px 16px 0 0; margin: -40px -40px 40px -40px; font-size: 1.6em; font-weight: 700; text-align: center; box-shadow: 0 4px 16px rgba(0,0,0,0.2); }
+    label { display: block; margin-top: 28px; font-weight: 500; color: #424242; font-size: 1.1em; margin-bottom: 8px; }
+    input, select, textarea { width: 100%; padding: 14px 18px; border: 2px solid #e0e0e0; border-radius: 10px; font-size: 1em; transition: all 0.3s ease; background: #fafafa; box-sizing: border-box; }
+    input:focus, select:focus, textarea:focus { border-color: #1976d2; outline: none; background: #fff; box-shadow: 0 0 0 4px rgba(25,118,210,0.15); }
+    textarea { resize: vertical; min-height: 100px; }
+    .row { display: flex; gap: 32px; flex-wrap: wrap; justify-content: space-between; }
+    .row > div { flex: 1; min-width: 250px; max-width: 300px; }
+    .med-row { display: flex; gap: 12px; margin-bottom: 16px; align-items: center; flex-wrap: wrap; }
+    .med-row input, .med-row select { flex: 1; min-width: 120px; }
+    .med-row button { background: #f44336; color: #fff; border: none; border-radius: 6px; padding: 8px 12px; cursor: pointer; transition: background 0.3s ease; font-size: 1.2em; }
+    .med-row button:hover { background: #d32f2f; }
+    button[type="button"] { background: #4caf50; color: #fff; border: none; border-radius: 8px; padding: 12px 20px; font-size: 1em; font-weight: 500; cursor: pointer; transition: all 0.3s ease; margin-top: 16px; display: inline-flex; align-items: center; gap: 8px; }
+    button[type="button"]:hover { background: #388e3c; transform: translateY(-2px); box-shadow: 0 4px 12px rgba(76,175,80,0.3); }
+    .submit-btn { background: linear-gradient(135deg, #4caf50 0%, #388e3c 100%); color: #fff; border: none; border-radius: 8px; flex: 1; font-size: 1.2em; padding: 16px 0; margin-top: 32px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.3s ease; font-weight: 600; }
+    .submit-btn:hover { background: linear-gradient(135deg, #388e3c 0%, #2e7d32 100%); transform: translateY(-2px); box-shadow: 0 6px 20px rgba(76,175,80,0.4); }
+    .submit-btn:active { transform: translateY(0); }
+    .print-btn { background: linear-gradient(135deg, #2196f3 0%, #1976d2 100%); color: #fff; border: none; border-radius: 8px; flex: 1; font-size: 1.2em; padding: 16px 0; margin-top: 32px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.3s ease; font-weight: 600; }
+    .print-btn:hover { background: linear-gradient(135deg, #1976d2 0%, #1565c0 100%); transform: translateY(-2px); box-shadow: 0 6px 20px rgba(33,150,243,0.4); }
+    .print-btn:active { transform: translateY(0); }
+    .success-msg { color: #4caf50; padding-top: 20px; text-align: center; font-weight: 500; font-size: 1.1em; }
+    .error-msg { color: #f44336; padding-top: 20px; text-align: center; font-weight: 500; font-size: 1.1em; }
+    .button-row { display: flex; gap: 16px; justify-content: center; flex-direction: row; }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+      body { padding: 10px; }
+      .container { padding: 20px; margin: 0; border-radius: 8px; }
+      .header { padding: 20px; font-size: 1.3em; margin: -20px -20px 20px -20px; }
+      .row { flex-direction: column; gap: 0; }
+      .row > div { margin-bottom: 16px; }
+      .med-row { flex-direction: column; gap: 8px; }
+      .med-row input, .med-row select { min-width: unset; }
+      button[type="button"], .submit-btn, .print-btn { font-size: 1em; padding: 12px 16px; }
+      .button-row { flex-direction: column; gap: 16px; align-items: center; }
+    }
+
+    @media (max-width: 480px) {
+      .container { padding: 16px; }
+      .header { padding: 16px; font-size: 1.2em; }
+      input, select, textarea { padding: 10px 12px; font-size: 0.9em; }
+      label { font-size: 1em; }
+    }
+  </style>
+</head>
+<body>
+  <form id="prescription-form" class="container">
+    <div class="header">New Patient Prescription Entry</div>
+    <div class="form-group">
+      <label>Phone Number *</label>
+      <input name="phone" type="text" required placeholder="Enter patient's phone number" />
+    </div>
+
+    <div class="row">
+      <div class="form-group">
+        <label>Patient Name *</label>
+        <input name="patient" type="text" required />
+      </div>
+      <div class="form-group">
+        <label>Gender *</label>
+        <select name="gender" required>
+          <option value="">Select Gender</option>
+          <option value="Male">Male</option>
+          <option value="Female">Female</option>
+          <option value="Other">Other</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Age *</label>
+        <select name="age" required>
+          <option value="">Select Age</option>
+          <!-- Age options -->
+          <script>
+            for(let i=1;i<=120;i++)document.write(`<option value="${i}">${i}</option>`);
+          </script>
+        </select>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>Diagnosis</label>
+      <textarea name="diagnosis" rows="2"></textarea>
+    </div>
+
+    <div class="form-group">
+      <label>Medicines</label>
+      <div id="medicines-list">
+        <div class="med-row">
+          <select name="medicine[]">
+            <option value="">Select Medicine</option>
+            <option>Paracetamol</option>
+            <option>Ibuprofen</option>
+            <option>Amoxicillin</option>
+            <!-- Add more medicines as needed -->
+          </select>
+          <input name="dosage[]" type="text" placeholder="e.g., 10 mg" />
+          <select name="frequency[]">
+            <option value="">Select Frequency</option>
+            <option>Once a day</option>
+            <option>Twice a day</option>
+            <option>Every 6 hours</option>
+          </select>
+        </div>
+      </div>
+      <button type="button" onclick="addMedicine()">Add Medicine</button>
+    </div>
+
+    <div class="form-group">
+      <label>Additional Instructions</label>
+      <textarea name="instructions" rows="2"></textarea>
+    </div>
+
+    <div class="form-group">
+      <label>Internal Note (not printed)</label>
+      <textarea name="note" rows="2"></textarea>
+    </div>
+
+    <div class="form-group">
+      <label>Next Visit</label>
+      <input name="next_visit" type="text" placeholder="dd-mm-yyyy" />
+    </div>
+
+    <div class="button-row">
+      <button class="submit-btn" type="submit">Save</button>
+      <button type="button" class="print-btn" onclick="generateOfficialPrescription()">Generate Official Prescription</button>
+    </div>
+    <div class="success-msg" id="msg"></div>
+  </form>
+
+  <script>
+    function addMedicine() {
+      const row = document.createElement('div');
+      row.className = 'med-row';
+      row.innerHTML = `
+        <select name="medicine[]">
+          <option value="">Select Medicine</option>
+          <option>Paracetamol</option>
+          <option>Ibuprofen</option>
+          <option>Amoxicillin</option>
+        </select>
+        <input name="dosage[]" type="text" placeholder="e.g., 10 mg" />
+        <select name="frequency[]">
+          <option value="">Select Frequency</option>
+          <option>Once a day</option>
+          <option>Twice a day</option>
+          <option>Every 6 hours</option>
+        </select>
+        <button type="button" onclick="this.parentElement.remove()">-</button>
+      `;
+      document.getElementById('medicines-list').appendChild(row);
+    }
+
+    function generateOfficialPrescription() {
+      // Gather all form data
+      const data = new FormData(document.getElementById('prescription-form'));
+      // For simplicity, flatten arrays for medicines
+      const medicines = [];
+      for(let i=0;;i++) {
+        const med = data.getAll('medicine[]')[i]||"",
+              dose = data.getAll('dosage[]')[i]||"",
+              freq = data.getAll('frequency[]')[i]||"";
+        if(!med && !dose && !freq) break;
+        medicines.push(`${med}|${dose}|${freq}`);
+      }
+
+      // Compose the object to send
+      const payload = {
+        type: 'prescription',
+        phone: data.get('phone'),
+        patient: data.get('patient'),
+        gender: data.get('gender'),
+        age: data.get('age'),
+        diagnosis: data.get('diagnosis'),
+        medicines: medicines.join(';'),
+        instructions: data.get('instructions'),
+        note: data.get('note'),
+        next_visit: data.get('next_visit'),
+        amount_due: data.get('amount_due') || '0',
+        amount_paid: data.get('amount_paid') || '0',
+        payment_status: data.get('payment_status') || 'Pending'
+      };
+
+      // Open official prescription page with data
+      const dataParam = encodeURIComponent(JSON.stringify(payload));
+      window.open(`prescription-official.html?data=${dataParam}`, '_blank');
+    }
+
+    document.getElementById('prescription-form').onsubmit = async function(e) {
+      e.preventDefault();
+      const url = 'https://script.google.com/macros/s/AKfycbxP3bI2aVBmP_dhWc7UFeSq0FCs-cmTR9_b153qwS_mX-hx8IHIUi5zKJn9_HPGzONCTA/exec'; // <-- Replace
+
+      // Gather all form data
+      const data = new FormData(this);
+      // For simplicity, flatten arrays for medicines
+      const medicines = [];
+      for(let i=0;;i++) {
+        const med = data.getAll('medicine[]')[i]||"",
+              dose = data.getAll('dosage[]')[i]||"",
+              freq = data.getAll('frequency[]')[i]||"";
+        if(!med && !dose && !freq) break;
+        medicines.push(`${med}|${dose}|${freq}`);
+      }
+
+      // Compose the object to send
+      const payload = {
+        type: 'prescription',
+        phone: data.get('phone'),
+        patient: data.get('patient'),
+        gender: data.get('gender'),
+        age: data.get('age'),
+        diagnosis: data.get('diagnosis'),
+        medicines: medicines.join(';'),
+        instructions: data.get('instructions'),
+        note: data.get('note'),
+        next_visit: data.get('next_visit')
+      };
+
+      // Send to Google Apps Script
+      const resp = await fetch(url, {
+        method: 'POST',
+        body: JSON.stringify(payload),
+        headers: { 'Content-Type': 'application/json' }
+      });
+      if(resp.ok) {
+        document.getElementById('msg').innerText = 'Submitted Successfully!';
+        this.reset();
+      } else {
+        document.getElementById('msg').className = 'error-msg';
+        document.getElementById('msg').innerText = 'Error, try again.';
+      }
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Official Prescription - Sparsha Skin Care Clinic</title>
+  <style>
+    body { font-family: 'Times New Roman', serif; background: #fff; margin: 0; padding: 20px; color: #000; }
+    .prescription { max-width: 800px; margin: 0 auto; border: 2px solid #000; padding: 20px; }
+    .header { border-bottom: 2px solid #000; padding-bottom: 10px; margin-bottom: 20px; text-align: center; }
+    .clinic-name { font-size: 24px; font-weight: bold; margin-bottom: 10px; }
+    .clinic-details { font-size: 14px; display: flex; justify-content: space-between; width: 100%; }
+    .clinic-address { text-align: left; }
+    .clinic-contact { text-align: right; }
+    .patient-info { display: flex; justify-content: space-between; margin-bottom: 20px; }
+    .patient-info div { flex: 1; }
+    .diagnosis { margin-bottom: 20px; }
+    .medicines { margin-bottom: 20px; }
+    .medicines table { width: 100%; border-collapse: collapse; }
+    .medicines th, .medicines td { border: 1px solid #000; padding: 8px; text-align: left; }
+    .instructions { margin-bottom: 20px; }
+    .footer { border-top: 2px solid #000; padding-top: 10px; text-align: center; font-size: 14px; }
+    .doctor-signature { margin-top: 40px; text-align: right; }
+    @media print {
+      body { padding: 0; }
+      .prescription { border: none; }
+      .medicines table th, .medicines table td { border: none; }
+      @page { margin: 0; }
+    }
+  </style>
+</head>
+<body>
+  <div class="prescription">
+    <div class="header">
+      <div class="clinic-name">Sparsha Skin Care Clinic</div>
+      <div class="clinic-details">
+        <div class="clinic-address">
+          Address: [Clinic Address]
+        </div>
+        <div class="clinic-contact">
+          Phone: [Clinic Phone]<br>
+          Email: [Clinic Email]
+        </div>
+      </div>
+    </div>
+
+    <div class="patient-info">
+      <div>
+        <strong>Patient Name:</strong> <span id="patient-name">[Patient Name]</span><br>
+        <strong>Age:</strong> <span id="patient-age">[Age]</span><br>
+        <strong>Gender:</strong> <span id="patient-gender">[Gender]</span>
+      </div>
+      <div>
+        <strong>Phone:</strong> <span id="patient-phone">[Phone]</span><br>
+        <strong>Date:</strong> <span id="prescription-date">[Date]</span><br>
+        <strong>Prescription ID:</strong> <span id="prescription-id">[ID]</span>
+      </div>
+    </div>
+
+    <div class="diagnosis">
+      <strong>Diagnosis:</strong><br>
+      <span id="diagnosis">[Diagnosis]</span>
+    </div>
+
+    <div class="medicines">
+      <strong>Medicines:</strong>
+      <table>
+        <thead>
+          <tr>
+            <th>Medicine</th>
+            <th>Dosage</th>
+            <th>Frequency</th>
+          </tr>
+        </thead>
+        <tbody id="medicines-table">
+          <!-- Medicines will be populated here -->
+        </tbody>
+      </table>
+    </div>
+
+    <div class="instructions">
+      <strong>Additional Instructions:</strong><br>
+      <span id="instructions">[Instructions]</span>
+    </div>
+
+    <div class="footer">
+      <strong>Next Visit:</strong> <span id="next-visit">[Next Visit]</span><br>
+      <div class="doctor-signature">
+        <strong>Doctor's Signature</strong><br>
+        ________________________<br>
+        Dr. [Doctor Name]
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Function to populate prescription data (can be called from parent window or with data)
+    function populatePrescription(data) {
+      document.getElementById('patient-name').textContent = data.patient || '';
+      document.getElementById('patient-age').textContent = data.age || '';
+      document.getElementById('patient-gender').textContent = data.gender || '';
+      document.getElementById('patient-phone').textContent = data.phone || '';
+      document.getElementById('prescription-date').textContent = new Date().toLocaleDateString();
+      document.getElementById('prescription-id').textContent = data.id || 'N/A';
+      document.getElementById('diagnosis').textContent = data.diagnosis || '';
+      document.getElementById('instructions').textContent = data.instructions || '';
+      document.getElementById('next-visit').textContent = data.next_visit || '';
+
+      const medicinesTable = document.getElementById('medicines-table');
+      medicinesTable.innerHTML = '';
+      if (data.medicines) {
+        const medicines = data.medicines.split(';');
+        medicines.forEach(med => {
+          const [name, dosage, frequency] = med.split('|');
+          const row = document.createElement('tr');
+          row.innerHTML = `
+            <td>${name || ''}</td>
+            <td>${dosage || ''}</td>
+            <td>${frequency || ''}</td>
+          `;
+          medicinesTable.appendChild(row);
+        });
+      }
+    }
+
+    // Check for data in URL parameters or localStorage
+    const urlParams = new URLSearchParams(window.location.search);
+    const dataParam = urlParams.get('data');
+    if (dataParam) {
+      const data = JSON.parse(decodeURIComponent(dataParam));
+      populatePrescription(data);
+    } else {
+      // Default or placeholder data
+      populatePrescription({});
+    }
+  </script>
+</body>
+</html>

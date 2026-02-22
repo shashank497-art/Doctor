@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Patient Search - Sparsha Skin Care Clinic</title>
+  <style>
+    body { font-family: 'Roboto', Arial, sans-serif; background: linear-gradient(135deg, #e3f2fd 0%, #f3e5f5 100%); margin: 0; padding: 20px; min-height: 100vh; }
+    .container { max-width: 1000px; margin: 0 auto; background: #fff; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); padding: 32px; }
+    .header { background: linear-gradient(135deg, #1976d2 0%, #1565c0 100%); color: #fff; padding: 24px 32px; border-radius: 12px 12px 0 0; margin: -32px -32px 32px -32px; font-size: 1.5em; font-weight: 700; text-align: center; box-shadow: 0 2px 10px rgba(0,0,0,0.2); }
+    .search-container { margin-bottom: 32px; display: flex; gap: 16px; align-items: center; }
+    .search-container input { flex: 1; padding: 12px 16px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 1em; transition: all 0.3s ease; }
+    .search-container input:focus { border-color: #1976d2; outline: none; box-shadow: 0 0 0 3px rgba(25,118,210,0.1); }
+    .search-container button { background: #4caf50; color: #fff; border: none; border-radius: 8px; padding: 12px 20px; font-size: 1em; font-weight: 500; cursor: pointer; transition: all 0.3s ease; }
+    .search-container button:hover { background: #388e3c; transform: translateY(-2px); box-shadow: 0 4px 12px rgba(76,175,80,0.3); }
+    .patient-card { background: #f9f9f9; border: 1px solid #e0e0e0; border-radius: 8px; padding: 20px; margin-bottom: 16px; transition: all 0.3s ease; }
+    .patient-card:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+    .patient-info { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; }
+    .patient-info div { margin-bottom: 8px; }
+    .patient-info strong { color: #424242; }
+    .prescription-btn { background: linear-gradient(135deg, #ff9800 0%, #f57c00 100%); color: #fff; border: none; border-radius: 8px; padding: 12px 20px; font-size: 1em; font-weight: 600; cursor: pointer; transition: all 0.3s ease; margin-top: 16px; }
+    .prescription-btn:hover { background: linear-gradient(135deg, #f57c00 0%, #e65100 100%); transform: translateY(-2px); box-shadow: 0 6px 20px rgba(255,152,0,0.4); }
+    .no-results { text-align: center; color: #666; font-size: 1.2em; margin-top: 32px; }
+    @media (max-width: 768px) {
+      .container { padding: 20px; margin: 0; border-radius: 8px; }
+      .header { padding: 20px; font-size: 1.3em; margin: -20px -20px 20px -20px; }
+      .search-container { flex-direction: column; }
+      .patient-info { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">Patient Search - Sparsha Skin Care Clinic</div>
+    <div class="search-container">
+      <input type="text" id="search-input" placeholder="Enter patient name or phone number" />
+      <button onclick="searchPatients()">Search</button>
+    </div>
+    <div id="patients-list"></div>
+  </div>
+
+  <script>
+    const url = 'YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL'; // <-- Replace
+
+    async function searchPatients() {
+      const query = document.getElementById('search-input').value.trim();
+      if (!query) {
+        alert('Please enter a search query.');
+        return;
+      }
+
+      try {
+        const response = await fetch(`${url}?action=searchPatient&query=${encodeURIComponent(query)}`);
+        const patients = await response.json();
+        displayPatients(patients);
+      } catch (error) {
+        console.error('Error searching patients:', error);
+        alert('Error searching patients. Please try again.');
+      }
+    }
+
+    function displayPatients(patients) {
+      const list = document.getElementById('patients-list');
+      if (patients.length === 0) {
+        list.innerHTML = '<div class="no-results">No patients found.</div>';
+        return;
+      }
+
+      list.innerHTML = patients.map(patient => `
+        <div class="patient-card">
+          <div class="patient-info">
+            <div><strong>Name:</strong> ${patient.name}</div>
+            <div><strong>Phone:</strong> ${patient.phone}</div>
+            <div><strong>Age:</strong> ${patient.age}</div>
+            <div><strong>Gender:</strong> ${patient.gender}</div>
+            <div><strong>Address:</strong> ${patient.address}</div>
+          </div>
+          <button class="prescription-btn" onclick="generatePrescription(${patient.id}, '${patient.name}', '${patient.phone}', ${patient.age}, '${patient.gender}')">Doctor Prescription</button>
+        </div>
+      `).join('');
+    }
+
+    function generatePrescription(id, name, phone, age, gender) {
+      // Redirect to prescription page with patient data
+      const data = {
+        patient: name,
+        phone: phone,
+        age: age,
+        gender: gender,
+        id: id
+      };
+      const encodedData = encodeURIComponent(JSON.stringify(data));
+      window.location.href = `Prescription.html?patient=${encodedData}`;
+    }
+
+    // Load all patients on page load
+    async function loadAllPatients() {
+      try {
+        const response = await fetch(`${url}?action=getPatients`);
+        const patients = await response.json();
+        displayPatients(patients);
+      } catch (error) {
+        console.error('Error loading patients:', error);
+      }
+    }
+
+    loadAllPatients();
+  </script>
+</body>
+</html>

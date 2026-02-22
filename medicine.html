@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Clinic Medicine Inventory Management</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
+    body { font-family: 'Roboto', Arial, sans-serif; background: linear-gradient(135deg, #e3f2fd 0%, #f3e5f5 100%); margin: 0; padding: 20px; min-height: 100vh; display: flex; align-items: center; justify-content: center; }
+    .container { max-width: 1200px; width: 100%; background: #fff; border-radius: 16px; box-shadow: 0 8px 32px rgba(0,0,0,0.15); padding: 40px; transition: all 0.3s ease; }
+    .header { background: linear-gradient(135deg, #1976d2 0%, #1565c0 100%); color: #fff; padding: 28px 40px; border-radius: 16px 16px 0 0; margin: -40px -40px 40px -40px; font-size: 1.6em; font-weight: 700; text-align: center; box-shadow: 0 4px 16px rgba(0,0,0,0.2); }
+    label { display: block; margin-top: 28px; font-weight: 500; color: #424242; font-size: 1.1em; margin-bottom: 8px; }
+    input, select, textarea { width: 100%; padding: 14px 18px; border: 2px solid #e0e0e0; border-radius: 10px; font-size: 1em; transition: all 0.3s ease; background: #fafafa; box-sizing: border-box; }
+    input:focus, select:focus, textarea:focus { border-color: #1976d2; outline: none; background: #fff; box-shadow: 0 0 0 4px rgba(25,118,210,0.15); }
+    textarea { resize: vertical; min-height: 100px; }
+    .row { display: flex; gap: 32px; flex-wrap: wrap; justify-content: space-between; }
+    .row > div { flex: 1; min-width: 250px; max-width: 300px; }
+    button { background: linear-gradient(135deg, #4caf50 0%, #388e3c 100%); color: #fff; border: none; border-radius: 8px; padding: 12px 20px; font-size: 1em; font-weight: 500; cursor: pointer; transition: all 0.3s ease; margin-top: 16px; }
+    button:hover { background: linear-gradient(135deg, #388e3c 0%, #2e7d32 100%); transform: translateY(-2px); box-shadow: 0 4px 12px rgba(76,175,80,0.3); }
+    .delete-btn { background: linear-gradient(135deg, #f44336 0%, #d32f2f 100%); }
+    .delete-btn:hover { background: linear-gradient(135deg, #d32f2f 0%, #b71c1c 100%); }
+    .edit-btn { background: linear-gradient(135deg, #ff9800 0%, #f57c00 100%); }
+    .edit-btn:hover { background: linear-gradient(135deg, #f57c00 0%, #e65100 100%); }
+    .export-btn { background: linear-gradient(135deg, #2196f3 0%, #1976d2 100%); }
+    .export-btn:hover { background: linear-gradient(135deg, #1976d2 0%, #1565c0 100%); }
+    .success-msg { color: #4caf50; padding-top: 20px; text-align: center; font-weight: 500; font-size: 1.1em; }
+    .error-msg { color: #f44336; padding-top: 20px; text-align: center; font-weight: 500; font-size: 1.1em; }
+    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+    th, td { padding: 12px; text-align: left; border-bottom: 1px solid #ddd; }
+    th { background: #f5f5f5; font-weight: 600; }
+    .low-stock { background: #ffebee; }
+    .search-row { display: flex; gap: 16px; margin-bottom: 20px; flex-wrap: wrap; }
+    .search-row input, .search-row select { flex: 1; min-width: 200px; }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+      body { padding: 10px; }
+      .container { padding: 20px; margin: 0; border-radius: 8px; }
+      .header { padding: 20px; font-size: 1.3em; margin: -20px -20px 20px -20px; }
+      .row { flex-direction: column; gap: 0; }
+      .row > div { margin-bottom: 16px; }
+      .search-row { flex-direction: column; }
+      table { font-size: 0.9em; }
+      th, td { padding: 8px; }
+    }
+
+    @media (max-width: 480px) {
+      .container { padding: 16px; }
+      input, select, textarea { padding: 10px 12px; font-size: 0.9em; }
+      label { font-size: 1em; }
+      button { padding: 10px 16px; font-size: 0.9em; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">Clinic Medicine Inventory Management</div>
+
+    <div class="search-row">
+      <input type="text" id="search" placeholder="Search by Medicine Name" />
+      <select id="filter">
+        <option value="">All</option>
+        <option value="low-stock">Low Stock</option>
+        <option value="expiring">Expiring Soon</option>
+      </select>
+
+    </div>
+
+    <table id="inventory-table">
+      <thead>
+        <tr>
+          <th>Medicine Name</th>
+          <th>Batch Number</th>
+          <th>Expiry Date</th>
+          <th>Quantity in Stock</th>
+          <th>Min Quantity</th>
+          <th>Supplier</th>
+          <th>Supplier Phone</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody id="inventory-body">
+        <!-- Rows will be populated by JS -->
+      </tbody>
+    </table>
+
+    <form id="add-form" style="display: none;">
+      <div class="row">
+        <div>
+          <label>Medicine Name *</label>
+          <input name="name" type="text" required />
+        </div>
+        <div>
+          <label>Batch Number *</label>
+          <input name="batch" type="text" required />
+        </div>
+        <div>
+          <label>Expiry Date *</label>
+          <input name="expiry" type="date" required />
+        </div>
+      </div>
+      <div class="row">
+        <div>
+          <label>Quantity in Stock *</label>
+          <input name="quantity" type="number" required />
+        </div>
+        <div>
+          <label>Minimum Required Quantity</label>
+          <input name="minQuantity" type="number" />
+        </div>
+        <div>
+          <label>Supplier</label>
+          <input name="supplier" type="text" />
+        </div>
+        <div>
+          <label>Supplier Phone</label>
+          <input name="supplierPhone" type="text" />
+        </div>
+      </div>
+      <button type="submit">Add Medicine</button>
+      <button type="button" onclick="hideForm()">Cancel</button>
+    </form>
+
+    <button onclick="showForm()">Add New Medicine</button>
+    <div class="success-msg" id="msg"></div>
+  </div>
+
+  <script>
+    const url = 'YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL'; // Replace with your deployed URL
+    let medicines = [];
+    let editingId = null;
+
+    async function loadMedicines() {
+      try {
+        const resp = await fetch(url);
+        if (resp.ok) {
+          medicines = await resp.json();
+          renderTable();
+        } else {
+          showMessage('Error loading medicines.', 'error');
+        }
+      } catch (error) {
+        showMessage('Network error.', 'error');
+      }
+    }
+
+    function renderTable() {
+      const tbody = document.getElementById('inventory-body');
+      tbody.innerHTML = '';
+      const search = document.getElementById('search').value.toLowerCase();
+      const filter = document.getElementById('filter').value;
+      medicines.filter(med => {
+        if (search && !med.name.toLowerCase().includes(search)) return false;
+        if (filter === 'low-stock' && med.quantity >= med.minQuantity) return false;
+        if (filter === 'expiring' && new Date(med.expiry) > new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)) return false;
+        return true;
+      }).forEach(med => {
+        const row = document.createElement('tr');
+        if (med.quantity < med.minQuantity) row.classList.add('low-stock');
+        row.innerHTML = `
+          <td>${med.name}</td>
+          <td>${med.batch}</td>
+          <td>${med.expiry}</td>
+          <td>${med.quantity}</td>
+          <td>${med.minQuantity}</td>
+          <td>${med.supplier || ''}</td>
+          <td>${med.supplierPhone || ''}</td>
+          <td>
+            <button class="edit-btn" onclick="editMedicine(${med.id})">Edit</button>
+            <button class="delete-btn" onclick="deleteMedicine(${med.id})">Delete</button>
+          </td>
+        `;
+        tbody.appendChild(row);
+      });
+    }
+
+    function showForm(med = {}) {
+      const form = document.getElementById('add-form');
+      form.style.display = 'block';
+      form.name.value = med.name || '';
+      form.batch.value = med.batch || '';
+      form.expiry.value = med.expiry || '';
+      form.quantity.value = med.quantity || '';
+      form.minQuantity.value = med.minQuantity || '';
+      form.supplier.value = med.supplier || '';
+      form.supplierPhone.value = med.supplierPhone || '';
+      editingId = med.id || null;
+      form.querySelector('button[type="submit"]').textContent = editingId ? 'Update Medicine' : 'Add Medicine';
+    }
+
+    function hideForm() {
+      document.getElementById('add-form').style.display = 'none';
+      editingId = null;
+    }
+
+    document.getElementById('add-form').onsubmit = async function(e) {
+      e.preventDefault();
+      const data = new FormData(this);
+      const payload = {
+        name: data.get('name'),
+        batch: data.get('batch'),
+        expiry: data.get('expiry'),
+        quantity: parseInt(data.get('quantity')),
+        minQuantity: parseInt(data.get('minQuantity')),
+        supplier: data.get('supplier'),
+        supplierPhone: data.get('supplierPhone')
+      };
+      try {
+        const method = editingId ? 'PUT' : 'POST';
+        const body = editingId ? { ...payload, id: editingId } : payload;
+        const resp = await fetch(url, {
+          method,
+          body: JSON.stringify(body),
+          headers: { 'Content-Type': 'application/json' }
+        });
+        if (resp.ok) {
+          showMessage(editingId ? 'Updated successfully!' : 'Added successfully!');
+          loadMedicines();
+          hideForm();
+          this.reset();
+        } else {
+          showMessage('Error saving medicine.', 'error');
+        }
+      } catch (error) {
+        showMessage('Network error.', 'error');
+      }
+    };
+
+    async function editMedicine(id) {
+      const med = medicines.find(m => m.id === id);
+      if (med) showForm(med);
+    }
+
+    async function deleteMedicine(id) {
+      if (confirm('Are you sure?')) {
+        try {
+          const resp = await fetch(url, {
+            method: 'DELETE',
+            body: JSON.stringify({ id }),
+            headers: { 'Content-Type': 'application/json' }
+          });
+          if (resp.ok) {
+            showMessage('Deleted successfully!');
+            loadMedicines();
+          } else {
+            showMessage('Error deleting medicine.', 'error');
+          }
+        } catch (error) {
+          showMessage('Network error.', 'error');
+        }
+      }
+    }
+
+    function exportCSV() {
+      const csv = 'Medicine Name,Batch Number,Expiry Date,Quantity in Stock,Minimum Required Quantity,Supplier,Supplier Phone\n' +
+        medicines.map(med => `${med.name},${med.batch},${med.expiry},${med.quantity},${med.minQuantity},${med.supplier || ''},${med.supplierPhone || ''}`).join('\n');
+      const blob = new Blob([csv], { type: 'text/csv' });
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = 'inventory.csv';
+      link.click();
+    }
+
+    function showMessage(msg, type = 'success') {
+      const el = document.getElementById('msg');
+      el.textContent = msg;
+      el.className = type + '-msg';
+      setTimeout(() => el.textContent = '', 5000);
+    }
+
+    document.getElementById('search').addEventListener('input', renderTable);
+    document.getElementById('filter').addEventListener('change', renderTable);
+
+    loadMedicines();
+  </script>
+</body>
+</html>
